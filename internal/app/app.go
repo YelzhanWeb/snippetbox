@@ -5,11 +5,14 @@ import (
 	"log"
 	"net/http"
 	"runtime/debug"
+
+	"github.com/YelzhanWeb/snippetbox/internal/models"
 )
 
 type Application struct {
 	ErrorLog *log.Logger
 	InfoLog  *log.Logger
+	Snippets *models.SnippetModel
 }
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {

@@ -1,18 +1,25 @@
 package handler
 
 import (
-	"fmt"
+	"errors"
 	"html/template"
 	"net/http"
 	"strconv"
 
 	"github.com/YelzhanWeb/snippetbox/internal/app"
+	"github.com/YelzhanWeb/snippetbox/internal/models"
 )
 
 func Home(app *app.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			app.NotFound(w)
+			return
+		}
+
+		_, err := app.Snippets.Latest()
+		if err != nil {
+			app.ServerError(w, err)
 			return
 		}
 
@@ -42,7 +49,33 @@ func SnippetView(app *app.Application) http.HandlerFunc {
 			app.NotFound(w)
 			return
 		}
-		fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
+
+		snippet, err := app.Snippets.Get(id)
+		if err != nil {
+			if errors.Is(err, models.ErrNoRecord) {
+				app.NotFound(w)
+			} else {
+				app.ServerError(w, err)
+			}
+			return
+		}
+
+		files := []string{
+			"./ui/html/base.tmpl",
+			"./ui/html/partials/nav.tmpl",
+			"./ui/html/pages/view.tmpl",
+		}
+		// Parse the template files...
+		ts, err := template.ParseFiles(files...)
+		if err != nil {
+			app.ServerError(w, err)
+			return
+		}
+
+		err = ts.ExecuteTemplate(w, "base", snippet)
+		if err != nil {
+			app.ServerError(w, err)
+		}
 	}
 }
 

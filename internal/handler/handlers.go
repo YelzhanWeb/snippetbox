@@ -12,7 +12,7 @@ import (
 func Home(app *app.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
-			http.NotFound(w, r)
+			app.NotFound(w)
 			return
 		}
 
@@ -24,15 +24,13 @@ func Home(app *app.Application) http.HandlerFunc {
 
 		ts, err := template.ParseFiles(files...)
 		if err != nil {
-			app.ErrorLog.Print(err.Error())
-			http.Error(w, "Internal Server Error", 500)
+			app.ServerError(w, err)
 			return
 		}
 
 		err = ts.ExecuteTemplate(w, "base", nil)
 		if err != nil {
-			app.ErrorLog.Print(err.Error())
-			http.Error(w, "Internal Server Error", 500)
+			app.ServerError(w, err)
 		}
 	}
 }
@@ -41,7 +39,7 @@ func SnippetView(app *app.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id, err := strconv.Atoi(r.URL.Query().Get("id"))
 		if err != nil || id < 1 {
-			http.NotFound(w, r)
+			app.NotFound(w)
 			return
 		}
 		fmt.Fprintf(w, "Display a specific snippet with ID %d...", id)
@@ -52,7 +50,7 @@ func SnippetCreate(app *app.Application) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			w.Header().Set("Allow", http.MethodPost)
-			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+			app.ClientError(w, http.StatusMethodNotAllowed)
 			return
 		}
 		w.Write([]byte("Create a new snippet..."))

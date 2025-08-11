@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/YelzhanWeb/snippetbox/internal/app"
-	"github.com/YelzhanWeb/snippetbox/internal/handler"
+	"github.com/YelzhanWeb/snippetbox/internal/server"
 )
 
 func main() {
@@ -22,18 +22,10 @@ func main() {
 		InfoLog:  infoLog,
 	}
 
-	mux := http.NewServeMux()
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
-
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
-	mux.HandleFunc("/", handler.Home(app))
-	mux.HandleFunc("/snippet/view", handler.SnippetView(app))
-	mux.HandleFunc("/snippet/create", handler.SnippetCreate(app))
-
 	srv := &http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,
-		Handler:  mux,
+		Handler:  server.Routes(app),
 	}
 
 	infoLog.Printf("Starting server on %s", *addr)

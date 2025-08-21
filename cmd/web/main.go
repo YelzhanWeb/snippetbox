@@ -24,15 +24,19 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
-
 	defer db.Close()
 
+	templateCache, err := models.NewTemplateCache()
+	if err != nil {
+		errorLog.Fatal(err)
+	}
 	app := &app.Application{
 		ErrorLog: errorLog,
 		InfoLog:  infoLog,
 		Snippets: &models.SnippetModel{
 			DB: db,
 		},
+		TemplateCache: templateCache,
 	}
 
 	srv := &http.Server{

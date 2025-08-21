@@ -10,6 +10,7 @@ type TemplData struct {
 	CurrentYear int
 	Snippet     *Snippet
 	Snippets    []*Snippet
+	Form        any
 }
 
 func humanDate(t time.Time) string {

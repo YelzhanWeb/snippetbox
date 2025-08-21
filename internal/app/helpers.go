@@ -2,12 +2,14 @@ package app
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 	"runtime/debug"
 	"time"
 
 	"github.com/YelzhanWeb/snippetbox/internal/models"
+	"github.com/go-playground/form"
 )
 
 func (app *Application) NewTemplateData(r *http.Request) *models.TemplData {
@@ -49,4 +51,23 @@ func (app *Application) Render(w http.ResponseWriter, status int, page string, d
 	w.WriteHeader(status)
 
 	buf.WriteTo(w)
+}
+
+func (app *Application) DecodePostForm(r *http.Request, dst any) error {
+	err := r.ParseForm()
+	if err != nil {
+		return err
+	}
+
+	err = app.FormDecoder.Decode(dst, r.PostForm)
+	if err != nil {
+		var invalidDecoderError *form.InvalidDecoderError
+		if errors.As(err, &invalidDecoderError) {
+			panic(err)
+		}
+
+		return err
+	}
+
+	return nil
 }

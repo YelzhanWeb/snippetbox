@@ -10,6 +10,7 @@ import (
 	"github.com/YelzhanWeb/snippetbox/internal/models"
 	"github.com/YelzhanWeb/snippetbox/internal/server"
 	storage "github.com/YelzhanWeb/snippetbox/pkg/db"
+	"github.com/go-playground/form"
 )
 
 func main() {
@@ -30,6 +31,9 @@ func main() {
 	if err != nil {
 		errorLog.Fatal(err)
 	}
+
+	formDecoder := form.NewDecoder()
+
 	app := &app.Application{
 		ErrorLog: errorLog,
 		InfoLog:  infoLog,
@@ -37,6 +41,7 @@ func main() {
 			DB: db,
 		},
 		TemplateCache: templateCache,
+		FormDecoder:   formDecoder,
 	}
 
 	srv := &http.Server{

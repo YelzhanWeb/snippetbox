@@ -5,11 +5,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/YelzhanWeb/snippetbox/internal/app"
 	"github.com/YelzhanWeb/snippetbox/internal/models"
 	"github.com/YelzhanWeb/snippetbox/internal/server"
 	storage "github.com/YelzhanWeb/snippetbox/pkg/db"
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
 	"github.com/go-playground/form"
 )
 
@@ -34,14 +37,19 @@ func main() {
 
 	formDecoder := form.NewDecoder()
 
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	app := &app.Application{
 		ErrorLog: errorLog,
 		InfoLog:  infoLog,
 		Snippets: &models.SnippetModel{
 			DB: db,
 		},
-		TemplateCache: templateCache,
-		FormDecoder:   formDecoder,
+		TemplateCache:  templateCache,
+		FormDecoder:    formDecoder,
+		SessionManager: sessionManager,
 	}
 
 	srv := &http.Server{

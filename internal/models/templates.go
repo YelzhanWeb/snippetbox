@@ -11,6 +11,7 @@ type TemplData struct {
 	Snippet     *Snippet
 	Snippets    []*Snippet
 	Form        any
+	Flash       string
 }
 
 func humanDate(t time.Time) string {

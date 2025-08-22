@@ -27,13 +27,15 @@ func Routes(app *ap.Application) http.Handler {
 		app.NotFound(w)
 	})
 
+	dynamic := alice.New(app.SessionManager.LoadAndSave)
+
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	router.HandlerFunc(http.MethodGet, "/", handler.Home(app))
-	router.HandlerFunc(http.MethodGet, "/snippet/view/:id", handler.SnippetView(app))
-	router.HandlerFunc(http.MethodGet, "/snippet/create", handler.SnippetCreate(app))
-	router.HandlerFunc(http.MethodPost, "/snippet/create", handler.SnippetCreatePost(app))
+	router.Handler(http.MethodGet, "/", dynamic.ThenFunc(handler.Home(app)))
+	router.Handler(http.MethodGet, "/snippet/view/:id", dynamic.ThenFunc(handler.SnippetView(app)))
+	router.Handler(http.MethodGet, "/snippet/create", dynamic.ThenFunc(handler.SnippetCreate(app)))
+	router.Handler(http.MethodPost, "/snippet/create", dynamic.ThenFunc(handler.SnippetCreatePost(app)))
 
 	standard := alice.New(app.RecoverPanic, app.LogRequest, ap.SecureHeaders)
 

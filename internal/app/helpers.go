@@ -15,6 +15,7 @@ import (
 func (app *Application) NewTemplateData(r *http.Request) *models.TemplData {
 	return &models.TemplData{
 		CurrentYear: time.Now().Year(),
+		Flash:       app.SessionManager.PopString(r.Context(), "flash"),
 	}
 }
 

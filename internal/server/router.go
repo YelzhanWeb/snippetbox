@@ -39,7 +39,7 @@ func Routes(app *ap.Application) http.Handler {
 
 	router.Handler(http.MethodGet, "/user/signup", dynamic.ThenFunc(handler.UserSignup(app)))
 	router.Handler(http.MethodPost, "/user/signup", dynamic.ThenFunc(handler.UserSignupPost(app)))
-	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(handler.UserLogin(app)))
+	router.Handler(http.MethodGet, "/user/login", dynamic.ThenFunc(handler.UserLogin(app)))
 	router.Handler(http.MethodPost, "/user/login", dynamic.ThenFunc(handler.UserLoginPost(app)))
 	router.Handler(http.MethodPost, "/user/logout", dynamic.ThenFunc(handler.UserLogoutPost(app)))
 

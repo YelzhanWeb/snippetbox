@@ -10,13 +10,20 @@ import (
 
 	"github.com/YelzhanWeb/snippetbox/internal/models"
 	"github.com/go-playground/form"
+	"github.com/justinas/nosurf"
 )
 
 func (app *Application) NewTemplateData(r *http.Request) *models.TemplData {
 	return &models.TemplData{
-		CurrentYear: time.Now().Year(),
-		Flash:       app.SessionManager.PopString(r.Context(), "flash"),
+		CurrentYear:     time.Now().Year(),
+		Flash:           app.SessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.IsAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
+}
+
+func (app *Application) IsAuthenticated(r *http.Request) bool {
+	return app.SessionManager.Exists(r.Context(), "authenticatedUserID")
 }
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {

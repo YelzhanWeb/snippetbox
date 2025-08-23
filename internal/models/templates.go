@@ -7,11 +7,13 @@ import (
 )
 
 type TemplData struct {
-	CurrentYear int
-	Snippet     *Snippet
-	Snippets    []*Snippet
-	Form        any
-	Flash       string
+	CurrentYear     int
+	Snippet         *Snippet
+	Snippets        []*Snippet
+	Form            any
+	Flash           string
+	IsAuthenticated bool
+	CSRFToken       string
 }
 
 func humanDate(t time.Time) string {

@@ -23,7 +23,11 @@ func (app *Application) NewTemplateData(r *http.Request) *models.TemplData {
 }
 
 func (app *Application) IsAuthenticated(r *http.Request) bool {
-	return app.SessionManager.Exists(r.Context(), "authenticatedUserID")
+	isAuthenticated, ok := r.Context().Value(IsAuthenticatedContextKey).(bool)
+	if !ok {
+		return false
+	}
+	return isAuthenticated
 }
 
 func (app *Application) ServerError(w http.ResponseWriter, err error) {
